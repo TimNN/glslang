@@ -15,5 +15,4 @@ endif(WIN32)
 
 add_subdirectory(glslang)
 add_subdirectory(OGLCompilersDLL)
-add_subdirectory(StandAlone)
 add_subdirectory(SPIRV)
