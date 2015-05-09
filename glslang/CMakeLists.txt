@@ -12,7 +12,7 @@ else(WIN32)
 endif(WIN32)
 
 set(SOURCES
-    MachineIndependent/glslang.y
+	gen/glslang_tab.cpp
     MachineIndependent/Constant.cpp
     MachineIndependent/InfoSink.cpp
     MachineIndependent/Initialize.cpp
@@ -41,6 +41,7 @@ set(SOURCES
     GenericCodeGen/Link.cpp)
 
 set(HEADERS
+	gen/glslang_tab.cpp.h
     Public/ShaderLang.h
     Include/BaseTypes.h
     Include/Common.h
@@ -67,31 +68,16 @@ set(HEADERS
     MachineIndependent/preprocessor/PpContext.h
     MachineIndependent/preprocessor/PpTokens.h)
 
-find_package(BISON)
-if(BISON_FOUND)
-    message("bison found")
-    BISON_TARGET(GLSLParser MachineIndependent/glslang.y ${CMAKE_CURRENT_BINARY_DIR}/gen_glslang_tab.cpp
-                 COMPILE_FLAGS
-                 "--defines=${CMAKE_CURRENT_BINARY_DIR}/glslang_tab.cpp.h")
-else(BISON_FOUND)
-    message("using custom command for bison on glslang.y")
-    add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/glslang_tab.cpp ${CMAKE_CURRENT_BINARY_DIR}/glslang_tab.cpp.h
-                       COMMAND ../tools/bison.exe --defines=${CMAKE_CURRENT_BINARY_DIR}/glslang_tab.cpp.h -t MachineIndependent/glslang.y -o ${CMAKE_CURRENT_BINARY_DIR}/glslang_tab.cpp
-                       MAIN_DEPENDENCY MachineIndependent/glslang.y
-                       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-    set(BISON_GLSLParser_OUTPUT_SOURCE ${CMAKE_CURRENT_BINARY_DIR}/glslang_tab.cpp)
-endif(BISON_FOUND)
-
-add_library(glslang STATIC ${BISON_GLSLParser_OUTPUT_SOURCE} ${SOURCES} ${HEADERS})
+add_library(glslang STATIC ${SOURCES} ${HEADERS})
 
 if(WIN32)
     source_group("Public" REGULAR_EXPRESSION "Public/*")
     source_group("MachineIndependent" REGULAR_EXPRESSION "MachineIndependent/[^/]*")
-    source_group("Generated Files" FILES ${CMAKE_CURRENT_BINARY_DIR}/glslang_tab.cpp ${CMAKE_CURRENT_BINARY_DIR}/glslang_tab.cpp.h)
+    source_group("Generated Files" FILES gen/glslang_tab.cpp gen/glslang_tab.cpp.h)
     source_group("Include" REGULAR_EXPRESSION "Include/[^/]*")
     source_group("GenericCodeGen" REGULAR_EXPRESSION "GenericCodeGen/*")
     source_group("MachineIndependent\\Preprocessor" REGULAR_EXPRESSION "MachineIndependent/preprocessor/*")
 endif(WIN32)
 
-install(TARGETS glslang 
+install(TARGETS glslang
         ARCHIVE DESTINATION lib)

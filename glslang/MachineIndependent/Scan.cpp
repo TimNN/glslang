@@ -43,7 +43,7 @@
 #include "../Include/Types.h"
 #include "SymbolTable.h"
 #include "ParseHelper.h"
-#include "glslang_tab.cpp.h"
+#include "../gen/glslang_tab.cpp.h"
 #include "ScanContext.h"
 #include "Scan.h"
 
@@ -52,7 +52,7 @@
 #include "preprocessor/PpTokens.h"
 
 namespace glslang {
-    
+
 // read past any white space
 void TInputScanner::consumeWhiteSpace(bool& foundNonSpaceTab)
 {
@@ -137,13 +137,13 @@ void TInputScanner::consumeWhitespaceComment(bool& foundNonSpaceTab)
 {
     do {
         consumeWhiteSpace(foundNonSpaceTab);
- 
+
         // if not starting a comment now, then done
         int c = peek();
         if (c != '/' || c < 0)
             return;
 
-        // skip potential comment 
+        // skip potential comment
         foundNonSpaceTab = true;
         if (! consumeComment())
             return;
@@ -194,10 +194,10 @@ bool TInputScanner::scanVersion(int& version, EProfile& profile, bool& notFirstT
         }
         lookingInMiddle = true;
 
-        // Nominal start, skipping the desktop allowed comments and white space, but tracking if 
+        // Nominal start, skipping the desktop allowed comments and white space, but tracking if
         // something else was found for ES:
         consumeWhitespaceComment(foundNonSpaceTab);
-        if (foundNonSpaceTab) 
+        if (foundNonSpaceTab)
             versionNotFirst = true;
 
         // "#"
@@ -474,7 +474,7 @@ void TScanContext::fillInKeywordMap()
     (*KeywordMap)["superp"] =                  SUPERP;
 
     ReservedSet = new std::set<std::string>;
-    
+
     ReservedSet->insert("common");
     ReservedSet->insert("partition");
     ReservedSet->insert("active");
@@ -575,7 +575,7 @@ int TScanContext::tokenize(TPpContext* pp, TParserToken& token)
         case CPP_AND_ASSIGN:            return AND_ASSIGN;
         case CPP_OR_ASSIGN:             return OR_ASSIGN;
         case CPP_XOR_ASSIGN:            return XOR_ASSIGN;
-                                   
+
         case CPP_INTCONSTANT:           parserToken->sType.lex.i = ppToken.ival;       return INTCONSTANT;
         case CPP_UINTCONSTANT:          parserToken->sType.lex.i = ppToken.ival;       return UINTCONSTANT;
         case CPP_FLOATCONSTANT:         parserToken->sType.lex.d = ppToken.dval;       return FLOATCONSTANT;
@@ -583,7 +583,7 @@ int TScanContext::tokenize(TPpContext* pp, TParserToken& token)
         case CPP_IDENTIFIER:            return tokenizeIdentifier();
 
         case EOF:                       return 0;
-                                   
+
         default:
             char buf[2];
             buf[0] = ppToken.token;
@@ -668,7 +668,7 @@ int TScanContext::tokenizeIdentifier()
         return keyword;
 
     case BUFFER:
-        if ((parseContext.profile == EEsProfile && parseContext.version < 310) || 
+        if ((parseContext.profile == EEsProfile && parseContext.version < 310) ||
             (parseContext.profile != EEsProfile && parseContext.version < 430))
             return identifierOrType();
         return keyword;
@@ -735,7 +735,7 @@ int TScanContext::tokenizeIdentifier()
     case MAT3X4:
     case MAT4X2:
     case MAT4X3:
-    case MAT4X4:        
+    case MAT4X4:
         return matNxM();
 
     case DMAT2:
@@ -782,7 +782,7 @@ int TScanContext::tokenizeIdentifier()
 
     case IMAGECUBEARRAY:
     case IIMAGECUBEARRAY:
-    case UIMAGECUBEARRAY:        
+    case UIMAGECUBEARRAY:
     case IMAGE2DMS:
     case IIMAGE2DMS:
     case UIMAGE2DMS:
@@ -835,14 +835,14 @@ int TScanContext::tokenizeIdentifier()
     case USAMPLER2DARRAY:
         afterType = true;
         return nonreservedKeyword(300, 130);
-        
+
     case ISAMPLER2DRECT:
     case USAMPLER2DRECT:
     case ISAMPLERBUFFER:
     case USAMPLERBUFFER:
         afterType = true;
         return es30ReservedFromGLSL(140);
-        
+
     case SAMPLER2DMS:
     case ISAMPLER2DMS:
     case USAMPLER2DMS:
@@ -908,7 +908,7 @@ int TScanContext::tokenizeIdentifier()
 
     case NOPERSPECTIVE:
         return es30ReservedFromGLSL(130);
-        
+
     case SMOOTH:
         if ((parseContext.profile == EEsProfile && parseContext.version < 300) ||
             (parseContext.profile != EEsProfile && parseContext.version < 130))
@@ -957,7 +957,7 @@ int TScanContext::tokenizeIdentifier()
         bool reserved = parseContext.profile == EEsProfile || parseContext.version >= 130;
         return identifierOrReserved(reserved);
     }
-    
+
     default:
         parseContext.infoSink.info.message(EPrefixInternalError, "Unknown glslang keyword", loc);
         return 0;
@@ -969,7 +969,7 @@ int TScanContext::identifierOrType()
     parserToken->sType.lex.string = NewPoolTString(tokenText);
     if (field) {
         field = false;
- 
+
         return FIELD_SELECTION;
     }
 
@@ -1093,8 +1093,8 @@ int TScanContext::firstGenerationImage(bool inEs310)
 {
     afterType = true;
 
-    if (parseContext.symbolTable.atBuiltInLevel() || 
-        (parseContext.profile != EEsProfile && (parseContext.version >= 420 || parseContext.extensionsTurnedOn(1, &GL_ARB_shader_image_load_store))) ||                                                     
+    if (parseContext.symbolTable.atBuiltInLevel() ||
+        (parseContext.profile != EEsProfile && (parseContext.version >= 420 || parseContext.extensionsTurnedOn(1, &GL_ARB_shader_image_load_store))) ||
         (inEs310 && parseContext.profile == EEsProfile && parseContext.version >= 310))
         return keyword;
 

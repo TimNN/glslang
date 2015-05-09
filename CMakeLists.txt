@@ -14,5 +14,4 @@ else(WIN32)
 endif(WIN32)
 
 add_subdirectory(glslang)
-add_subdirectory(OGLCompilersDLL)
 add_subdirectory(SPIRV)
